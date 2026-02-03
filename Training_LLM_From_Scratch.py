@@ -93,7 +93,8 @@ def evaluate_tokenizer_fast(pretrained_tokenizer: PreTrainedTokenizerFast,
         chars = len(ln)
         total_chars += chars
         # encode without adding special tokens for per-sentence metric
-        ids = pretrained_tokenizer.encode(ln, add_special_tokens=False).ids
+        #ids = pretrained_tokenizer.encode(ln, add_special_tokens=False).ids
+        ids = pretrained_tokenizer.encode(ln, add_special_tokens=False)
         total_tokens += len(ids)
         if unk_id is not None:
             total_unk_tokens += sum(1 for i in ids if i == unk_id)
