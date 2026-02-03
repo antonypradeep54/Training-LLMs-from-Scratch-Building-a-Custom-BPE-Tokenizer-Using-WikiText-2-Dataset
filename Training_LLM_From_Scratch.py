@@ -224,14 +224,24 @@ def main():
         "This is an example line from WikiText-2 dataset."
     ]
     print("Demo encodings:")
+
     for t in demo_texts:
-        enc = hf_tokenizer.encode(t)
-        print(f"Text: {t}")
-        print(f"Tokens: {enc.tokens}")
-        print(f"IDs: {enc.ids}")
-        dec = hf_tokenizer.decode(enc.ids)
-        print(f"Decoded: {dec}")
-        print("")
+    # Encode text → list of IDs
+    ids = hf_tokenizer.encode(t, add_special_tokens=False)
+    
+    # Convert IDs → token strings
+    tokens = hf_tokenizer.convert_ids_to_tokens(ids)
+    
+    # Decode back to text
+    dec = hf_tokenizer.decode(ids)
+    
+    # Print results
+    print(f"Text: {t}")
+    print(f"Tokens: {tokens}")
+    print(f"IDs: {ids}")
+    print(f"Decoded: {dec}")
+    print("")
+
 
 
 if __name__ == "__main__":
