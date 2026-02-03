@@ -61,7 +61,7 @@ def train_bpe_tokenizer(text_iterator: Iterable[str],
     tokenizer.pre_tokenizer = ByteLevel(add_prefix_space=True)
     trainer = trainers.BpeTrainer(vocab_size=vocab_size, special_tokens=special_tokens)
     # train_from_iterator accepts any iterable of strings
-    tokenizer.train_from_iterator(text_iterator, trainer=trainer, show_progress=show_progress)
+    tokenizer.train_from_iterator(text_iterator, trainer=trainer)
     return tokenizer
 
 
