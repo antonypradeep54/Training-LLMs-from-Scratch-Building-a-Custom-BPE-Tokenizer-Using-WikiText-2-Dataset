@@ -1,62 +1,55 @@
 # Custom BPE Tokenizer on WikiText-2
 
-This project trains a custom Byte Pair Encoding (BPE) tokenizer from scratch on the WikiText-2 subset of the `salesforce/wikitext` dataset (config `wikitext-2-v1`) and demonstrates saving, reloading, and evaluating it.
+This project trains a custom Byte Pair Encoding (BPE) tokenizer on the WikiText-2 subset of the `salesforce/wikitext` dataset (configuration `wikitext-2-v1`). It evaluates the tokenizer on validation and test text and saves it in a Hugging Face-compatible format.
 
-Contents
-- `train_tokenizer.py` — loads & cleans WikiText-2, trains a BPE tokenizer, evaluates it on val/test, saves tokenizer in HuggingFace-compatible format.
-- `requirements.txt` — Python dependencies.
-- `README.md` — this file.
+**Scope:** this project trains a tokenizer; it does not train a language model.
 
-Quick summary of features
-- Deduplicates training text and normalizes lines.
-- Trains a BPE tokenizer (default vocab_size=30000) with special tokens: `[PAD] [UNK] [CLS] [SEP] [MASK]`.
-- Evaluates: vocabulary size, average tokens per sentence, unk rate, tokenization consistency (encode->decode match fraction), and compression ratio (avg chars per token).
-- Saves tokenizer to a directory that can be loaded as a `transformers.PreTrainedTokenizerFast`.
+## Contents
 
-Requirements
-- Python 3.9+ (3.10 recommended)
-- See `requirements.txt` for pip packages.
+- `train_tokenizer.py` — dataset cleaning, BPE tokenizer training, evaluation, and saving
+- `requirements.txt` — Python dependencies
+- `README.md` — project documentation
 
-Example usage
-1. Create a virtual env:
-   python -m venv .venv
-   source .venv/bin/activate
+## Features
 
-2. Install requirements:
-   pip install -r requirements.txt
+- Deduplicates and normalizes training text.
+- Trains a BPE tokenizer with a default vocabulary size of 30,000.
+- Supports special tokens `[PAD]`, `[UNK]`, `[CLS]`, `[SEP]`, and `[MASK]`.
+- Reports vocabulary size, average tokens per sentence, unknown-token rate, encode/decode consistency, and characters per token on evaluation text.
+- Saves a tokenizer that can be loaded with Hugging Face Transformers.
 
-3. Train the tokenizer (defaults shown):
-   python train_tokenizer.py \
-     --vocab_size 30000 \
-     --output_dir ./tokenizer-wikitext2 \
-     --special_tokens "[PAD],[UNK],[CLS],[SEP],[MASK]" \
-     --max_train_lines 200000
+## Requirements
 
-Notes:
-- `max_train_lines` controls the number of deduplicated training lines to use (helps for faster iteration). Set to `0` to use all.
-- Training is CPU-bound. GPU is not required.
+- Python 3.9+ (Python 3.10 recommended)
+- See `requirements.txt` for Python packages.
+- Outbound network access is needed to download the dataset from Hugging Face.
 
-RunPod VM recommendations
-- Tokenizer training is CPU & I/O bound; GPU is not required.
-- Recommended minimal configuration for interactive work:
-  - CPU: 8 vCPUs (higher is better for faster training)
-  - RAM: 32 GB
-  - Disk: 50+ GB SSD
-  - OS: Ubuntu 22.04
-  - Python: 3.10
-- If you plan to fine-tune or run a language model afterward, add a GPU instance:
-  - For small models: 1x NVIDIA A10 / T4 (16–24 GB)
-  - For larger models: 1x NVIDIA A100 (40/80 GB)
-- Networking: Make sure outbound access to Hugging Face is allowed (dataset download).
+## Run
 
-What I provide
-- A single Python script `train_tokenizer.py` that:
-  - Loads the dataset
-  - Cleans & deduplicates
-  - Trains a BPE tokenizer
-  - Evaluates on validation and test
-  - Saves a HF-compatible tokenizer directory with `tokenizer.json` plus files created by `transformers.PreTrainedTokenizerFast.save_pretrained`.
+Create and activate a virtual environment:
 
-If you'd like:
-- I can split training & evaluation into separate files.
-- I can add a small Jupyter notebook demonstrating interactive usage and visualization of token-length distributions.
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+Train the tokenizer:
+
+```bash
+python train_tokenizer.py \
+  --vocab_size 30000 \
+  --output_dir ./tokenizer-wikitext2 \
+  --special_tokens "[PAD],[UNK],[CLS],[SEP],[MASK]" \
+  --max_train_lines 200000
+```
+
+The `--max_train_lines` argument limits the number of deduplicated training lines used. Set it to `0` to use all available deduplicated training lines. Evaluation uses up to 20,000 lines per validation/test split by default; this can be adjusted with `--sample_eval_lines`.
+
+## Output
+
+The output directory contains `tokenizer.json` and the files written by `PreTrainedTokenizerFast.save_pretrained`. The script also prints evaluation summaries for the validation and test splits.
+
+## Limitations
+
+Reported metrics describe this tokenizer on the selected WikiText-2 evaluation text. They are not evidence of language-model training quality or downstream task performance. Actual results depend on the dataset, vocabulary size, and evaluation settings.
